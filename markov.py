@@ -4,6 +4,7 @@ from random import choice
 import twitter
 
 
+
 def open_and_read_file(filenames):
     """Given a list of files, open them, read the text, and return one long
         string."""
@@ -55,15 +56,30 @@ def make_text(chains):
         word = choice(chains[key])
         words.append(word)
         key = (key[1], word)
+        # if sum([len(i) for i in words]) >= 100:
+        #     break
+        words = " ".join(words)
+        if len(words) >= 140:
+            break
 
-    return " ".join(words)
+    return words
+        # for i in range(len(words)):
 
 
 def tweet(chains):
     # Use Python os.environ to get at environmental variables
     # Note: you must run `source secrets.sh` before running this file
     # to make sure these environmental variables are set.
-    pass
+    api = twitter.Api(
+        consumer_key=os.environ['TWITTER_CONSUMER_KEY'],
+        consumer_secret=os.environ['TWITTER_CONSUMER_SECRET'],
+        access_token_key=os.environ['TWITTER_ACCESS_TOKEN_KEY'],
+        access_token_secret=os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
+
+    api.VerifyCredentials()
+
+    print make_text(chains)
+
 
 # Get the filenames from the user through a command line prompt, ex:
 # python markov.py green-eggs.txt shakespeare.txt
@@ -75,5 +91,7 @@ text = open_and_read_file(filenames)
 # Get a Markov chain
 chains = make_chains(text)
 
+# tweet the 140 character chain to our twitter
+tweet(chains)
 # Your task is to write a new function tweet, that will take chains as input
 # tweet(chains)
